@@ -94,14 +94,9 @@ chat_log = scrolledtext.ScrolledText(root, state='disabled', wrap=tk.WORD)
 chat_log.grid(row=0, column=0, columnspan=2, sticky="nsew")
 
 chat_log.tag_configure("center", justify="center")
-
-
 chat_log.tag_configure("timestamp", font=("Arial", 10))
-
 chat_log.tag_configure("message", font=("Arial", 10))
-
 chat_log.tag_configure("broadcast", font=("Arial", 10), foreground="black", justify="center")  # Gaya font untuk broadcast
-
 chat_log.tag_configure("history", font=("Arial", 10), foreground="black")
 
 message_entry = tk.Entry(root)
