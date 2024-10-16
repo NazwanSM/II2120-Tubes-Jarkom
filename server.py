@@ -2,13 +2,31 @@ import socket
 import threading
 import queue
 import os
+import time
 
 messages = queue.Queue()
 clients = []
-authorized_clients = []
+message_history = []
 history_file = "chat_history.txt"
 
-# Mencari IP dari device
+# Load chat dari file (kalo ada)
+def load_history():
+    if os.path.exists(history_file):
+        with open(history_file, "r") as f:
+            for line in f:
+                message_history.append(line.strip())
+                print(f"Loaded history message: {line.strip()}")
+        print("Chat history loaded.")
+
+# Menyimpan chat ke file
+def save_history(message):
+    timestamp = time.strftime("%H:%M")
+    message_with_time = f"[{timestamp}] {message}"
+    with open(history_file, "a") as f:
+        f.write(message_with_time + "\n")
+        f.flush()
+
+# Menerima input IP dari device
 hostname = socket.gethostname()
 ip_address = socket.gethostbyname(hostname)
 
@@ -38,7 +56,6 @@ def send_message_history(addr):
         if combined_messages:
             server.sendto(combined_messages.encode(), addr)
 
-
 # Menerima pesan dari client
 def receive():
     while True:
@@ -49,48 +66,47 @@ def receive():
             pass
 
 # Mengirimkan pesan ke semua client yang terdaftar
-def broadcast():
+def broadcast(): 
     while True:
         while not messages.empty():
             message, addr = messages.get()
             decoded_message = message.decode()
+            print(time.strftime("%Y-%m-%d %H:%M:%S") + ": " + message.decode())
 
-            # Memasukkan alamat client yang belum terdaftar
             if addr not in clients:
                 clients.append(addr)
+            decoded_message = message.decode()
 
-            # Memproses autentikasi jika client belum authorized
-            if addr not in authorized_clients:
-                if decoded_message.startswith("PASSWORD:"):
-                    entered_password = decoded_message.split(":")[1]
+            if decoded_message.startswith("SIGNUP_TAG:"):
+                name = decoded_message.split(":")[1]
+                welcome_message = f"{name} has joined the room!"
 
-                    # Cek apakah password yang dimasukkan benar
-                    if entered_password == chatroom_password:
-                        authorized_clients.append(addr)
-                        send_message_history(addr)  # Kirim riwayat pesan ke client baru
-                        server.sendto("Akses diizinkan. Selamat datang di chatroom!".encode(), addr)
-                    else:
-                        server.sendto("Password salah. Coba lagi.".encode(), addr)
-                else:
-                    server.sendto("Kamu harus memasukkan password terlebih dahulu. Format: PASSWORD:<password>".encode(), addr)
+            # Memindahkan fungsi password chat room ke client.py
+            
+                # Menampilkan histroy chat saat client keluar 
+                for hist_msg in message_history:
+                    try:
+                        server.sendto(f"HISTORY_TAG:{hist_msg}".encode(), addr)
+                    except:
+                        clients.remove(addr)
+
+                for client in clients:
+                    try:
+                        server.sendto(welcome_message.encode(), client)
+                    except:
+                        clients.remove(client)
             else:
-                # Jika client sudah authorized, proses pesan
-                if decoded_message.startswith("SIGNUP_TAG:"):
-                    name = decoded_message[decoded_message.index(":")+1:]
-                    broadcast_message = f"{name} joined!"
-                    print(broadcast_message)
-                    save_message_to_file(broadcast_message)  # Simpan pesan join ke file
-                    for client in clients:
-                        server.sendto(broadcast_message.encode(), client)
-                else:
-                    print(decoded_message)
-                    save_message_to_file(decoded_message)  # Simpan pesan ke file
-                    for client in clients:
-                        try:
-                            server.sendto(message, client)
-                        except:
-                            clients.remove(client)
+                timestamped_message = f"{decoded_message} [{time.strftime('%H:%M')}]"
+                message_history.append(timestamped_message)
+                save_history(decoded_message) # Simpen chat ke file
+                for client in clients:
+                    try:
+                        server.sendto(message, client)
+                    except:
+                        clients.remove(client)
 
+print("Server is running...") 
+load_history()
 t1 = threading.Thread(target=receive)
 t2 = threading.Thread(target=broadcast)
 
