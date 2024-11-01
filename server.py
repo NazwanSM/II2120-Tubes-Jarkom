@@ -78,7 +78,7 @@ def broadcast():
                         server.sendto("USERNAME_TAKEN".encode('utf-8'), addr)
                     else:
                         user_credentials[username] = password  # Simpan username dan password
-                        welcome_message = f"{username} has joined the room!"
+                        welcome_message = f"{username} join Chat Room nih Sob!"
                         print(f"New user joined: {username}")
 
                         send_message_history(addr)

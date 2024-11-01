@@ -10,7 +10,7 @@ import time
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("dark-blue")
 
-CORRECT_PASSWORD = "1234"
+CORRECT_PASSWORD = "jarkom100"
 attempts = 0
 
 root = ctk.CTk()
@@ -117,7 +117,7 @@ def receive_messages():
             break
 
 # Setup message entry and send button
-message_entry = ctk.CTkEntry(root, placeholder_text="Type your message here...", width=400, height=50)
+message_entry = ctk.CTkEntry(root, placeholder_text="Pak kasihani UTS Kami ;(", width=400, height=50)
 message_entry.grid(row=1, column=0, padx=10, pady=10, sticky='ew')
 
 send_button = ctk.CTkButton(root, text="Send", height=50, command=send_message)
@@ -134,12 +134,12 @@ def request_password():
     error_label.grid(row=2, column=0, columnspan=2)
 
     while attempts < 3:
-        password = custom_dialog("Password", "Enter room password:", is_password=True)
+        password = custom_dialog("Password", "Masukkan Password Chat Room:", is_password=True)
         if password == CORRECT_PASSWORD:
             error_label.grid_remove()
             return True
         else:
-            error_label.configure(text=f"Wrong password! {2-attempts} attempts remaining")
+            error_label.configure(text=f"Tetot! {2-attempts} kali kesempatan lagi!")
             root.update()
             attempts += 1
     
@@ -148,23 +148,23 @@ def request_password():
 def request_username_and_password():
     global username
     while True:
-        username = custom_dialog("Username", "Enter your username:")
-        password = custom_dialog("Password", "Enter your password:", is_password=True)
+        username = custom_dialog("Username", "Masukkan Nama Pengguna:")
+        password = custom_dialog("Password", "Masukkan Password Kamu:", is_password=True)
         if username and password:
             # Kirim username dan password ke server untuk pendaftaran
             client.sendto(f"SIGNUP_TAG:{username}:{password}".encode('utf-8'), (server_ip, 9999))
             # Tunggu respons dari server
             response, _ = client.recvfrom(1024)
             if response.decode('utf-8') == "USERNAME_TAKEN":
-                update_chat_log("Username already taken, please choose another.", "broadcast")
+                update_chat_log("Username udah taken, cari yang lain ya :)", "broadcast")
             else:
                 break  # Username diterima
 
 def request_login():
     global username
     while True:
-        username = custom_dialog("Username", "Enter your username:")
-        password = custom_dialog("Password", "Enter your password:", is_password=True)
+        username = custom_dialog("Username", "Masukkan Nama Pengguna:")
+        password = custom_dialog("Password", "Masukkan Password Kamu:", is_password=True)
         if username and password:
             # Kirim login ke server
             client.sendto(f"LOGIN_TAG:{username}:{password}".encode('utf-8'), (server_ip, 9999))
@@ -173,7 +173,7 @@ def request_login():
             if response.decode('utf-8') == "LOGIN_SUCCESS":
                 break  # Login berhasil
             else:
-                update_chat_log("Login failed. Please check your username and password.", "broadcast")
+                update_chat_log("Passwordnya salah :(", "broadcast")
 
 if request_password():  # Meminta password untuk masuk ke chat room
     request_username_and_password() # Untuk login jika pendaftaran gagal
