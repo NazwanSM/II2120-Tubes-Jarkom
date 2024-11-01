@@ -107,7 +107,7 @@ def receive_messages():
                 root.after(0, update_chat_log, history_message, "history")
             else:
                 timestamp = time.strftime("%H:%M")
-                if "has joined the room!" in decoded_message:
+                if "join Chat Room nih Sob!" in decoded_message:
                     root.after(0, update_chat_log, decoded_message, "broadcast")
                 else:
                     formatted_message = f"[{timestamp}] {decoded_message}"
