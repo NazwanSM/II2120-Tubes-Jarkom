@@ -105,7 +105,7 @@ ip_address = socket.gethostbyname(hostname)
 
 try:
     server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    server.bind((ip_address, 9999))
+    server.bind((f"{ip_address}", 9999))
     print(f"Server running on {ip_address}:9999")
 except Exception as e:
     print(f"Error starting server: {e}")
