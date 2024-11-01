@@ -1,4 +1,4 @@
-# Chat Room Application
+# Chat Room Application - 01_Tugas Socket Programming
 
 Aplikasi chat room sederhana menggunakan Python dengan komunikasi UDP dan antarmuka grafis menggunakan CustomTkinter.
 
